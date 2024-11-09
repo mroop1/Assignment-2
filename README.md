@@ -89,38 +89,42 @@ sudo ./install_packages.sh -f ~/user_package_list
 
 ---
 
-## Project 2: User Creation Script
+# Project 2: User Creation Script
 
 ### Overview
-
-Project 2 includes a script called `create_user.sh` that automates user creation. It sets the user's shell, adds them to specified groups, and prompts for a password.
+This project includes a Bash script (`create_user.sh`) that automates the process of creating a new user on a system without using built-in user creation tools like `useradd`. The script directly modifies system files, sets up a home directory, assigns user groups, and creates a password for the new user. This helps you understand the underlying process of user management on Linux systems.
 
 ### Script Details
 
-#### create_user.sh
-
-**Purpose**: Automates the process of creating a user on the system.
+#### `create_user.sh`
+**Purpose**: Automates the manual creation of a new user by directly modifying the system files (`/etc/passwd`, `/etc/shadow`, `/etc/group`, `/etc/gshadow`) and setting up the user's home directory.
 
 **How It Works**:
-
-- Takes command-line options for the username, shell, and groups.
-- Checks if the user already exists.
-- Creates the user and prompts for a password if they don't exist.
+- **Parses command-line options** for the username, UID, GID, password, home directory, and shell.
+- **Checks for existing users** and IDs to prevent conflicts.
+- **Modifies system files** to add user information:
+  - **`/etc/passwd`**: Adds an entry for the new user.
+  - **`/etc/shadow`**: Adds an encrypted password entry.
+  - **`/etc/group`**: Creates a group entry if necessary.
+  - **`/etc/gshadow`**: Adds a group shadow entry.
+- **Creates the home directory** and sets appropriate ownership and permissions.
 
 **Usage**:
 ```bash
-sudo ./create_user.sh [ -u username ] [ -s shell ] [ -g group_name1, group_name2 ]
-```
+sudo ./create_user.sh -u <username> -p <password> -uid <UID> -gid <GID> -h <home_directory> -s <shell>
 
-**Options**:
+Options:
 
-- `-u <username>`: The username to create (required).
-- `-s <shell>`: The shell to use for the user (e.g., `/bin/bash`).
-- `-g <group_name1,group_name2>`: Comma-separated list of groups to add the user to.
+    -u <username>: The username to create (required).
+    -p <password>: The password for the user (required).
+    -uid <UID>: The unique user ID (UID) (required).
+    -gid <GID>: The group ID (GID) (required).
+    -h <home_directory>: The home directory path (default is /home/<username>).
+    -s <shell>: The shell to use for the user (e.g., /bin/bash).
 
 **Example**:
 ```bash
-sudo ./create_user.sh -u test_user -s /bin/bash -g wheel, test_group
+sudo ./user_creation.sh -u test_user -s /bin/bash -g wheel, test_group
 ```
 
 
@@ -129,7 +133,7 @@ sudo ./create_user.sh -u test_user -s /bin/bash -g wheel, test_group
 
 1. Ensure the script has execute permissions:
 ```bash
-chmod 755 create_user.sh
+chmod 755 user_creation.sh
 ```
 - `755`: 
 	- `7`: Gives read write and execute privileges to the user
@@ -137,7 +141,7 @@ chmod 755 create_user.sh
 	- `5`: Gives read and execute privileges to others
 2. Run the script with the appropriate options:
 ```bash
-sudo ./create_user.sh -u arch -s /bin/bash -g arch
+sudo ./user_creation.sh -u arch -s /bin/bash -g arch
 ```
 
 ---
